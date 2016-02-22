@@ -43,7 +43,7 @@ class IrcPlugin(b3.plugin.Plugin):
     nick="b3bot"
     realName = "B3 IRC BOT"
     group_channel = ""
-    all_channel = ""
+    match_channel = "UrbanTerrorMatches"
     cmd_level = 1
     net_ip = None
     net_port = None
@@ -62,8 +62,7 @@ class IrcPlugin(b3.plugin.Plugin):
          self.nick = self.config.get('settings', 'nick') 
          self.my_channel = self.config.get('settings', 'my_channel') 
          self.group_channel = self.config.get('settings', 'group_channel') 
-         self.all_channel = self.config.get('settings', 'all_channel') 
-         
+
          
     def onStartup(self):
         # get the admin plugin so we can register commands
@@ -86,7 +85,7 @@ class IrcPlugin(b3.plugin.Plugin):
         self.sock.connect((self.host, self.port))
         self.sock.send("nick %s\r\n" % self.nick)
         self.sock.send("USER %s %s bla :/connect %s %s\r\n" % (self.nick, self.nick, self.net_ip, self.net_port))
-        self.sock.send("JOIN %s \r\n" % (self.all_channel))
+        self.sock.send("JOIN %s \r\n" % (self.match_channel))
         self.sock.send('JOIN %s \r\n' % (self.group_channel))  
         self.sock.send("JOIN %s \r\n" % (self.my_channel))
         
@@ -100,24 +99,18 @@ class IrcPlugin(b3.plugin.Plugin):
         if event.type == b3.events.EVT_CLIENT_CONNECT:
            tclient = event.client
            #self.sock.send("PRIVMSG %s :%s Connected \r\n" % (self.group_channel,tclient.name)) 
-
-
         elif event.type == b3.events.EVT_CLIENT_DISCONNECT:
             tclient = event.client
             #self.sock.send("PRIVMSG %s :%s Disconnected\r\n" % (self.group_channel, tclient.name)) 
-            
         elif event.type == b3.events.EVT_GAME_MAP_CHANGE:
-            
             #get players, map, gametype. Announce on #all
-            self.gametype = self.console.getCvar('g_gametype').getInt()
-            map = self.console.getCvar('mapname').getString()
-            self.sock.send("PRIVMSG %s :%s %s %s players /connect %s.%s\r\n" % (self.gamelist[self.gametype], map, self.playerCount, self.group_channel,self.net_ip,self.net_port,)) 
+            #self.gametype = self.console.getCvar('g_gametype').getInt()
+            #map = self.console.getCvar('mapname').getString()
+            #self.sock.send("PRIVMSG %s :%s %s %s players /connect %s.%s\r\n" % (self.gamelist[self.gametype], map, self.playerCount, self.group_channel,self.net_ip,self.net_port,)) 
         elif event.type == b3.events.EVT_GAME_EXIT:
-            self.playerCount = len(self.console.clients.getList())
+            #self.playerCount = len(self.console.clients.getList())
             #self.sock.send("PRIVMSG  %s :/connect %s:%s %s on %s, %s players\r\n" % (self.group_channel,self.net_ip,self.net_port,self.gamelist[gametype],map,self.playerCount)) 
 
-   
-            
     def irc_read(self):
         #msg is broken up into parts
         # 0  prefix includes sent from
@@ -162,7 +155,7 @@ class IrcPlugin(b3.plugin.Plugin):
                 #send to person or channel
                 if channel[0] =='#': 
                     #its to a specific channel
-                    self.sock.send("PRIVMSG %s :%s->%s \r\n" % (message[0], client.name, message[1])) 
+                    self.sock.send("PRIVMSG IRC->%s: %s \r\n" % (client.name, message[1])) 
                    
                 else:
                     self.sock.send("PRIVMSG %s :%s->%s \r\n" % (self.all_channel, client.name, data)) 
