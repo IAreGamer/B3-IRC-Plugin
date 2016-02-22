@@ -1,7 +1,7 @@
 <configuration plugin="irc">
 	<settings name="settings">
 		<!-- The IRC server. You should not change unless you are sure because it will isolate your servers from the rest of the community. -->
-		<set name="host">irc.q3ut4.com</set>
+		<set name="host">irc.iareserver.com</set>
 		<!-- port usually 6667 but might be different-->
 		<set name="port">6667</set>
 		<!-- channel nick of this game server. It will be a USER on the channels. No spaces keep it short
@@ -12,11 +12,11 @@
              such as playing same game or location. Europe, NorthAmerica, UT4, CoD etc
 			 GAME CHANNELS BEGIN WITH #
 			 -->
-		<set name="all_channel">#ut4</set>
+		<set name="all_channel">#ut4_match</set>
 		<!-- Join this channel that is a small group such as servers and the website of a single clan-->
-		<set name="group_channel">#pmclan</set>
+		<set name="group_channel">#iaregameplayer</set>
 		<!-- This is the channel for this specific server -->
-		<set name="my_channel">#drunkenflags</set>
+		<set name="my_channel">#127.0.0.1:27960</set>
 		<!-- user level to use irc command.  Since this requires some knowledge and to prevent abuse it should not
              be guest or registered users.		-->
 		<set name="cmd_level">1</set>

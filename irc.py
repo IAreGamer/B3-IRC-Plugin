@@ -74,6 +74,8 @@ class IrcPlugin(b3.plugin.Plugin):
         
         
         self._adminPlugin.registerCommand(self, 'irc', self.cmd_level, self.cmd_irc)
+        self._adminPlugin.registerCommand(self, 'match', self.cmd_level, self.cmd_match)
+
         self.registerEvent(b3.events.EVT_GAME_MAP_CHANGE)
         self.registerEvent(b3.events.EVT_GAME_EXIT)
         self.registerEvent(b3.events.EVT_CLIENT_CONNECT)
@@ -81,6 +83,7 @@ class IrcPlugin(b3.plugin.Plugin):
         self.net_ip = self.console.getCvar('net_ip').getString()
         self.net_port = self.console.getCvar('net_port').getString()
         self.hostname = self.console.getCvar('sv_hostname').getString()
+		self.my_channel = self.net_ip + ":" + self.net_port
         self.sock=socket.socket( )
         self.sock.connect((self.host, self.port))
         self.sock.send("nick %s\r\n" % self.nick)
@@ -139,31 +142,31 @@ class IrcPlugin(b3.plugin.Plugin):
         
     def cmd_irc(self, data, client, cmd):
             """\
-            <channel> <message>- Send an IRC message.
+            <message>- Send an IRC message.
             Channel is optional and can be a channel or #all
             """
            
             if len(data) != 0:
-                message = string.split(data,None,1)
-                channel = message[0]
-                #msg 0 is either command or recipient
-                #msg 1 is message. 
-                #if msg 0 == a command we have to send entire message because it will contain arguments
-                # create a dictionary of commands and match those to msg[0]
-                #if msg[0]find('') != -1: #send to specific channel
-                #send_socket.send("PRIVMSG  #%s :<%s> %s \r\n" % (self.all_channel, client.name, msg[1]))     
-                #send to person or channel
-                if channel[0] =='#': 
-                    #its to a specific channel
-                    self.sock.send("PRIVMSG IRC->%s: %s \r\n" % (client.name, message[1])) 
-                   
-                else:
-                    self.sock.send("PRIVMSG %s :%s->%s \r\n" % (self.all_channel, client.name, data)) 
+                message = self.my_channel + "-" + client.name + ": " + data
+                #send_socket.send("PRIVMSG  #%s :<%s> %s \r\n" % (self.all_channel, client.name, msg))     
+                self.sock.send("PRIVMSG %s %s \r\n" % (self.group_channel, message)) 
                     
-                
-                
-                #else: #send to my group channel
-                #    send_socket.send("#%s :<%s> %s \r\n" % (self.group_channel, client.name, data)) 
             else:
-            #no data
+				#no data
+                client.message("You didn't say anything")        
+
+	def cmd_match(self, data, client, cmd):
+            """\
+            <message>- Send an IRC message.
+            Channel is optional and can be a channel or #all
+            """
+           
+            if len(data) != 0:
+                message = self.my_channel + "-" + client.name + ": " + data
+                #send_socket.send("PRIVMSG  #%s :<%s> %s \r\n" % (self.all_channel, client.name, msg))     
+                self.sock.send("PRIVMSG %s %s \r\n" % (self.group_channel, message)) 
+                    
+            else:
+				#no data
                 client.message("You didn't say anything")           
+				
